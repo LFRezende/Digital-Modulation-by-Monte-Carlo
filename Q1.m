@@ -1,262 +1,256 @@
-%% Exame Final de EET-50: Luis Felipe Silva Rezende Soares %%
-% Instituto Tecnológico de Aeronáutica, Junho de 2023 %
-% Introdução a Sistemas de Comunicação
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Utilized for the Final Exam of Communication Systems (EET-50)) in the Aeronautics Institute of Technology,ITA, Brazil %
+%  This Source file plots the comparison between one of the theoretical modulations and their respective experimental   %
+%  modulation                                                                                                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% ### ITEM A ### --- Obtencao do Probabilidade de Erro %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utilized for the Final Exam of Communication Systems (EET-50) in the Aeronautics Institute of Technology, ITA, Brazil %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% ### ITEM A ### --- Obtaining the Error Probability %%
 format long;
 
-% Mensagem %
+% Message %
 clear all;
 clc;
 close all;
 
-% Parametros de Iteracao % 
+% Iteration Parameters % 
 EbN0min = -2;
 EbN0max = 16;
-quantidade = 100;
+quantity = 100;
 errorCounter = 0;
-probErro2Pam = [];
-EbN0vector = EbN0min:(EbN0max - EbN0min)/quantidade:EbN0max;
+probError2Pam = [];
+EbN0vector = EbN0min:(EbN0max - EbN0min)/quantity:EbN0max;
 
-% Modulacao 2PAM:
+% 2-PAM Modulation:
 m = 2;
-Es = 1;                 % Energia de Simbolo Es = (1^2 + 1^2)/2 = 1;
-N = 1000;               % Iteracao em Monte Carlo
-len_mensagem = 1280;    % Comprimento da Mensagem enviada (Simbolos)
-mensagem = randi([0, m-1], [1, len_mensagem]);  % Mensagem
+Es = 1;                 % Symbol Energy Es = (1^2 + 1^2)/2 = 1;
+N = 1000;               % Monte Carlo Iterations
+messageLength = 1280;   % Length of the transmitted message (symbols)
+message = randi([0, m-1], [1, messageLength]);  % Message
 
-% Vamos plotar o comportamento da modulacao conforme aumenta-se o Eb/N0.%
+% Let's plot the behavior of the modulation as Eb/N0 increases.
 
-for q=1:quantidade
-    % Contador de Erros Totais Obtidos apos Monte Carlo %
+for q = 1:quantity
+    % Total Error Counter obtained after Monte Carlo %
     errorCounter = 0; 
-    %%% Laco da Rotina Iterativa de Monte Carlo %%%
-    for i= 1:N
+    %%% Monte Carlo Iterative Loop %%%
+    for i = 1:N
         
-        % Selecao de Eb/N0 para ruido construido %
+        % Select Eb/N0 for constructed noise %
         EbN0 = EbN0vector(q);                               
-        mensagemPAM = pammod(mensagem, m);     % Modulacao PAM  
+        pamMessage = pammod(message, m);     % PAM Modulation  
 
-        % Construcao do Ruido por Energia de Simbolo e Adicao %
-        ruido = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(mensagem));
-        mensagemPAMruidosa = mensagemPAM + ruido;
+        % Construct Symbol Energy-based Noise and Add it %
+        noise = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(message));
+        noisyPAMMessage = pamMessage + noise;
 
-        % Demodulacao PAM %
-        mensagemDemodPAM = pamdemod(mensagemPAMruidosa, m);             
+        % PAM Demodulation %
+        demodulatedPAMMessage = pamdemod(noisyPAMMessage, m);             
     
-        % Analise: Diferencas entre o sinal recebido e o sinal original.%
-        errorCounter = errorCounter + sum(mensagemDemodPAM ~= mensagem);
+        % Analysis: Differences between the received signal and the original signal.
+        errorCounter = errorCounter + sum(demodulatedPAMMessage ~= message);
     end
-    % Computo de Probabilidade%
-    probErro2Pam(q) = errorCounter/(len_mensagem*N);
+    % Error Probability Computation
+    probError2Pam(q) = errorCounter/(messageLength*N);
 end
 
-% Plot da Teorica 2-PAM %%
+% Theoretical 2-PAM Plot %%
 
-% Parametros Basicos
+% Basic Parameters
 m = 2; % m-PAM
-% Conjunto de Dados para o Plot da Teorica % 
+% Data Set for Theoretical Plot % 
 
 EbN0linear = 10.^(EbN0vector./10);
 
-% Probabilidade teorica 
-argumento = sqrt(6*(log2(m)/(m^2-1)).*(EbN0linear));
-Pe_t = 2*(1 - 1/m)*qfunc(argumento); % Formula Teorica de Probabilidade
+% Theoretical Probability 
+argument = sqrt(6*(log2(m)/(m^2-1)).*(EbN0linear));
+Pe_t = 2*(1 - 1/m)*qfunc(argument); % Theoretical Probability Formula
 
-% Plot da Figura
+% Figure Plot
 figure();
 semilogy(EbN0vector, Pe_t, 'b');
 hold on;
 grid on;
 xlabel('Eb/No (dB)');
-ylabel('Probabilidade de Erro');
-title('Probabilidade de Erro 2-PAM');
-semilogy(EbN0vector(1:length(probErro2Pam)), probErro2Pam, 'r');
+ylabel('Error Probability');
+title('2-PAM Error Probability');
+semilogy(EbN0vector(1:length(probError2Pam)), probError2Pam, 'r');
 axis([-2, 10, 10^-5, 1]);
-legend('Teórico', 'Experimental');
+legend('Theoretical', 'Experimental');
 hold off;
 
 
 
-%% ### ITEM B ### --- Calculo da Modulacao 4-PAM %%
+%% ### ITEM B ### --- 4-PAM Modulation Calculation %%
 
-% Parametros de Iteracao % 
+% Iteration Parameters % 
 EbN0min = -2;
 EbN0max = 16;
-quantidade = 100;
+quantity = 100;
 errorCounter = 0;
-probErro2Pam = [];
-EbN0vector = EbN0min:(EbN0max - EbN0min)/quantidade:EbN0max;
-probErro4Pam = [];
-% Modulacao 4PAM:
+probError2Pam = [];
+EbN0vector = EbN0min:(EbN0max - EbN0min)/quantity:EbN0max;
+probError4Pam = [];
+% 4-PAM Modulation:
 m = 4;
-mensagem = randi([0, m-1], [1, len_mensagem]);
-% Energia de Símbolo: 3^2 + 1^2 + 1^2 + 3^2 = 20 --> Es = 20/4.
-Es = 5;  % Energia do Simbolo
+message = randi([0, m-1], [1, messageLength]);
+% Symbol Energy: 3^2 + 1^2 + 1^2 + 3^2 = 20 --> Es = 20/4.
+Es = 5;  % Symbol Energy
 
-% Vamos plotar o comportamento da modulacao conforme aumenta-se o Eb/N0.
-for q = 1:quantidade
+% Let's plot the behavior of the modulation as Eb/N0 increases.
+for q = 1:quantity
     errorCounter = 0;
-    for i= 1:N
+    for i = 1:N
                                                                        
         EbN0 = EbN0vector(q);                                                              
         
-        % Normalização da Mensagem e feita no ruido. %
-        mensagemPAM = pammod(mensagem, m);
-        ruido = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(mensagem));
-        mensagemPAMruidosa = mensagemPAM + ruido;
-        mensagemDemodPAM = pamdemod(mensagemPAMruidosa, m);
+        % Message Normalization is performed in the noise. %
+        pamMessage = pammod(message, m);
+        noise = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(message));
+        noisyPAMMessage = pamMessage + noise;
+        demodulatedPAMMessage = pamdemod(noisyPAMMessage, m);
     
-        % Analise: Diferencas entre o sinal recebido e o sinal original.%
-        errorCounter = errorCounter + sum(mensagemDemodPAM ~= mensagem);     
+        % Analysis: Differences between the received signal and the original signal.
+        errorCounter = errorCounter + sum(demodulatedPAMMessage ~= message);     
     end
-    probErro4Pam(q) = errorCounter/(len_mensagem*N);
+    probError4Pam(q) = errorCounter/(messageLength*N);
 end
 
+% Theoretical 4-PAM Plot %
 
-
-% Plot da Teorica 4-PAM %
-
-% Parametros Basicos
+% Basic Parameters
 m = 4; % m-PAM
 EbN0linear = 10.^(EbN0vector./10);
 
-% Calcular a probabilidade de erro teorica
-argumento = sqrt(6*(log2(m)/(m^2-1)).*(EbN0linear));
+% Calculate the theoretical error probability
+argument = sqrt(6*(log2(m)/(m^2-1)).*(EbN0linear));
 
-% Normalizacao pela Energia de Simbolo.
+% Symbol Energy Normalization.
 %Eb = Es/K => eS = KEb --> M-pam: 
-Pe_t = 2*(1 - 1/m)*qfunc(argumento); % Funcao Q
+Pe_t = 2*(1 - 1/m)*qfunc(argument); % Q Function
 
-% Curva teorica plotada
+% Theoretical curve plotted
 figure();
 semilogy(EbN0vector, Pe_t, 'black');
 hold on;
 grid on;
 xlabel('Eb/No (dB)');
-ylabel('Probabilidade de Erro');
-title('Probabilidade de Erro da 4-PAM');
-semilogy(EbN0vector(1:length(probErro4Pam)), probErro4Pam, 'green');
+ylabel('Error Probability');
+title('4-PAM Error Probability');
+semilogy(EbN0vector(1:length(probError4Pam)), probError4Pam, 'green');
 axis([-2, 14, 10^-5, 1]);
-legend('Teórico', 'Experimental');
+legend('Theoretical', 'Experimental');
 hold off;
 
-%% ### ITEM C ###  --- Calculo da Probabilidade de Erro de Modulacao QAM %%
+%% ### ITEM C ### --- QAM Modulation Error Probability Calculation %%
 
 
-% Parametros de Iteracao % 
+% Iteration Parameters % 
 EbN0min = -2;
 EbN0max = 16;
 errorCounter = 0;
-probErro4QAM = [];
-% Modulacao 4-QAM:
+probError4QAM = [];
+% 4-QAM Modulation:
 m = 4;
-mensagem = randi([0, m-1], [1, len_mensagem]);
-% Cálculo da Energia de Símbolo: É o dobro da sqrt(4) - PAM, logo o dobro
-% da 2-PAM
+message = randi([0, m-1], [1, messageLength]);
+% Calculation of Symbol Energy: It is twice the sqrt(4) - PAM, thus twice
+% the 2-PAM
 Es = 2;
 
-% Vamos plotar o comportamento da modulacao conforme aumenta-se o Eb/N0.
-for q=1:quantidade
+% Let's plot the behavior of the modulation as Eb/N0 increases.
+for q = 1:quantity
     errorCounter = 0;  
-    for i= 1:N
+    for i = 1:N
         EbN0 = EbN0vector(q); 
-
-        % Modulacao, ruido e demodulacao %
-        mensagemQAM = qammod(mensagem, m); 
-        ruido = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(mensagem)) ... 
-            + 1j*(sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(mensagem));
-        mensagemQAMruidosa = mensagemQAM + ruido; 
-        mensagemDemodQAM = qamdemod(mensagemQAMruidosa, m);
+ % Modulation, noise, and demodulation %
+        qamMessage = qammod(message, m); 
+        noise = (sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(message)) ... 
+            + 1j*(sqrt(Es/(2*(10^(EbN0/10))*log2(m))))*randn(size(message));
+        noisyQAMMessage = qamMessage + noise; 
+        demodulatedQAMMessage = qamdemod(noisyQAMMessage, m);
     
-        % Analise: Diferencas entre o sinal recebido e o sinal original.%
-        errorCounter = errorCounter + sum(mensagemDemodQAM ~= mensagem);
+        % Analysis: Differences between the received signal and the original signal.
+        errorCounter = errorCounter + sum(demodulatedQAMMessage ~= message);
 
     end
-    probErro4QAM(q) = errorCounter/(len_mensagem*N);
+    probError4QAM(q) = errorCounter/(messageLength*N);
 end
 
 
-% Plot da Curva 4-QAM %
+% 4-QAM Curve Plot %
 
-                                                                   
 EbN0linear = 10.^(EbN0vector./10);
 
-% Calcular a probabilidade de erro teorica
-argumento = sqrt(3*(log2(m)/(m-1)).*(EbN0linear));
-Pe_t = 4*(1 - 1/sqrt(m)).*qfunc(argumento) - 4*(1 - 1/sqrt(m))^2.*qfunc(argumento).^2; % Funcao Q
+% Calculate the theoretical error probability
+argument = sqrt(3*(log2(m)/(m-1)).*(EbN0linear));
+Pe_t = 4*(1 - 1/sqrt(m)).*qfunc(argument) - 4*(1 - 1/sqrt(m))^2.*qfunc(argument).^2; % Q Function
 
-% Curva teorica plotada
+% Theoretical curve plotted
 figure();
 semilogy(EbN0vector, Pe_t);
 hold on;
 grid on;
 xlabel('Eb/No (dB)');
-ylabel('Probabilidade de Erro');
-title('Probabilidade de Erro da 4-QAM');
-semilogy(EbN0vector(1:length(probErro4QAM)), probErro4QAM);
+ylabel('Error Probability');
+title('4-QAM Error Probability');
+semilogy(EbN0vector(1:length(probError4QAM)), probError4QAM, 'blue');
 axis([-2, 10, 10^-5, 1]);
-legend('Teórico', 'Experimental');
+legend('Theoretical', 'Experimental');
 hold off;
 
-
-%% ### ITEM D ###  - Modulacao FSK %%
-m = 2;         % Modulacao 2-FSK
+%% ### ITEM D ### - FSK Modulation %%
+m = 2;         % 2-FSK Modulation
 k = log2(m);   % Bits
 EbNo = 5;      % Eb/No (dB)
-Fs = 16;       % Taxa de Amostragem
-nsamp = 8;     % Numero de Amostras por Simbolo
-freqsep = 10;  % Separacao em Frequencia 
+Fs = 16;       % Sampling Rate
+nsamp = 8;     % Number of Samples per Symbol
+freqsep = 10;  % Frequency Separation
 
-len_mensagem = 128;
+messageLength = 128;
 N = 100;
-mensagem = randi([0, m-1], [1, len_mensagem]);
+message = randi([0, m-1], [1, messageLength]);
 
-
-% Parametros de Iteracao % 
+% Iteration Parameters % 
 EbN0min = -2;
 EbN0max = 16;
-probErro2FSK = [];
-EbN0vector = EbN0min:(EbN0max - EbN0min)/quantidade:EbN0max;
-Es = 1; % A energia de simbolo do sinal BFSK é a propria amplitude do simbolo.
+probError2FSK = [];
+EbN0vector = EbN0min:(EbN0max - EbN0min)/quantity:EbN0max;
+Es = 1; % The symbol energy of the BFSK signal is the symbol amplitude itself.
 
-% Modulacao 2FSK
-for q=1:quantidade
-    taxaDeErro = 0;
-    for i= 1:N
+% 2FSK Modulation
+for q = 1:quantity
+    errorRate = 0;
+    for i = 1:N
     
         EbN0 = EbN0vector(q);                                                                 
-        mFSK = fskmod(mensagem,m,freqsep,nsamp,Fs);
-        mFSKRuidosa  = awgn(mFSK,(EbN0)+10*log10(k)-10*log10(nsamp),'measured',[],'dB');
-        mFSKDemod = fskdemod(mFSKRuidosa,m,freqsep,nsamp,Fs);
+        mFSK = fskmod(message, m, freqsep, nsamp, Fs);
+        mFSKNoisy = awgn(mFSK, (EbN0) + 10*log10(k) - 10*log10(nsamp), 'measured', [], 'dB');
+        mFSKDemod = fskdemod(mFSKNoisy, m, freqsep, nsamp, Fs);
 
-        %   Para a modulacao 2FSK, a existencia de 1 bit torna BER = SER %
-        [num,BER] = biterr(mensagem,mFSKDemod);
+        % For 2FSK modulation, the existence of 1 bit makes BER = SER %
+        [num, BER] = biterr(message, mFSKDemod);
 
-        taxaDeErro = taxaDeErro + BER;
-        
+        errorRate = errorRate + BER;
         
     end
-    %   Probabilidade de Erro Experimental %
-    probErro2FSK(q) = taxaDeErro/N;
+    % Experimental Error Probability %
+    probError2FSK(q) = errorRate/N;
 
-    %   Vetor de Probabilidade de Erro Teorico (em 2-FSK, BER = SER)%
-    BER_teorico= berawgn(EbN0,'fsk',m,'noncoherent');
-    Pe_t(q) = BER_teorico;
+    % Theoretical Error Probability Vector (in 2-FSK, BER = SER)%
+    BER_theoretical = berawgn(EbN0, 'fsk', m, 'noncoherent');
+    Pe_t(q) = BER_theoretical;
 end
 
-% Plot da Curva para 2-FSK
+% Plotting the Curve for 2-FSK
 figure();
 semilogy(EbN0vector(1:length(Pe_t)), Pe_t);
 hold on;
-semilogy(EbN0vector(1:length(probErro2FSK)), probErro2FSK);
+semilogy(EbN0vector(1:length(probError2FSK)), probError2FSK);
 grid on;
 xlabel('Eb/No (dB)');
-ylabel('Probabilidade de Erro');
-title('Probabilidade de Erro da 2-FSK');
-legend('Teórico', 'Experimental');
+ylabel('Error Probability');
+title('2-FSK Error Probability');
+legend('Theoretical', 'Experimental');
 hold off;
