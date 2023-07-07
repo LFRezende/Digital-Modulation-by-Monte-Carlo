@@ -266,3 +266,19 @@ semilogy(EbN0vector, Pe_tQPSK_bit);
 semilogy(EbN0vector, Pe_t8PSK_bit);
 semilogy(EbN0vector, Pe_t16_bit);
 semilogy(EbN0vector, Pe_t64_bit);
+% Limiting Probability Line %
+line([-2, 22], [probLim_BIT, probLim_BIT], 'LineStyle', '--', 'Color', 'blue');
+%%%%%%%% Formation of Ranges - Enable for Question >>>6<<< %%%%%%%%%
+% ranges = [7.359999999999999, 10.960000000000001, 11.680000000000000, 16.240000000000002];
+% line([ranges(1), ranges(1)], [10^-8, 1], 'LineStyle', '--', 'Color', 'black');
+% line([ranges(2), ranges(2)], [10^-8, 1], 'LineStyle', '--', 'Color', 'black');
+% line([ranges(3), ranges(3)], [10^-8, 1], 'LineStyle', '--', 'Color', 'black');
+% line([ranges(4), ranges(4)], [10^-8, 1], 'LineStyle', '--', 'Color', 'black');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+grid on;
+xlabel('Eb/No (dB)');
+ylabel('B.E.R.');
+title('B.E.R. vs Eb/N0');
+axis([EbN0min, EbN0max, 10^-8, 1]);
+legend('Experimental','BPSK','QPSK','8-PSK','16-QAM', '64-QAM');
+hold off;
